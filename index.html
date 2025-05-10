@@ -1,0 +1,2156 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Itinerary Timeline Manager</title>
+    <!-- Bootstrap 5 CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css"
+    />
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+    <style>
+      :root {
+        --primary-color: #3a86ff;
+        --secondary-color: #8338ec;
+        --success-color: #06d6a0;
+        --warning-color: #ffbe0b;
+        --danger-color: #ef476f;
+        --light-color: #f8f9fa;
+        --dark-color: #212529;
+
+        /* MRT Line Colors */
+        --cg-color: #009645;
+        --ew-color: #009645;
+        --ns-color: #df2827;
+        --ne-color: #9900ab;
+        --cc-color: #fa9e0d;
+        --dt-color: #0055b8;
+        --te-color: #9d5918;
+        --bp-color: #a54e2a;
+        --ce-color: #6c5ce7;
+        --st-color: #9d5918;
+        --pt-color: #9d5918;
+        --rt-color: #9d5918;
+      }
+
+      body {
+        background-color: #f5f7fa;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      .navbar {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .navbar-brand {
+        font-weight: 700;
+        color: white !important;
+      }
+
+      .card {
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: none;
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      }
+
+      .card-header {
+        border-radius: 12px 12px 0 0 !important;
+        font-weight: 600;
+        background-color: white;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      }
+
+      .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+      }
+
+      .btn-primary:hover {
+        background-color: #2a75e8;
+        border-color: #2a75e8;
+      }
+
+      .btn-success {
+        background-color: var(--success-color);
+        border-color: var(--success-color);
+      }
+
+      .btn-success:hover {
+        background-color: #05c591;
+        border-color: #05c591;
+      }
+
+      .btn-danger {
+        background-color: var(--danger-color);
+        border-color: var(--danger-color);
+      }
+
+      .btn-danger:hover {
+        background-color: #e43464;
+        border-color: #e43464;
+      }
+
+      /* Timeline Styles */
+      .timeline {
+        position: relative;
+        padding: 20px 0;
+      }
+
+      .timeline-date-header {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        color: white;
+        border-radius: 12px;
+        padding: 10px 20px;
+        font-weight: 600;
+        display: inline-block;
+        margin-bottom: 20px;
+        position: relative;
+        z-index: 2;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        width: auto;
+      }
+
+      .timeline-row {
+        display: flex;
+        margin-bottom: 30px;
+        position: relative;
+      }
+
+      .timeline-column {
+        flex: 1;
+        padding: 0 10px;
+        position: relative;
+      }
+
+      .timeline-column-header {
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 10px;
+        padding: 8px 15px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        text-align: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        position: relative;
+      }
+
+      .timeline-column:nth-child(odd) .timeline-column-header {
+        background-color: var(--primary-color);
+      }
+
+      .timeline-column:nth-child(even) .timeline-column-header {
+        background-color: var(--secondary-color);
+      }
+
+      .timeline-column:nth-child(3n) .timeline-column-header {
+        background-color: var(--success-color);
+      }
+
+      .timeline-column:nth-child(4n) .timeline-column-header {
+        background-color: var(--warning-color);
+        color: var(--dark-color);
+      }
+
+      .timeline-content {
+        padding: 20px;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        position: relative;
+        margin-bottom: 20px;
+        border-left: 4px solid var(--primary-color);
+      }
+
+      .timeline-column:nth-child(odd) .timeline-content {
+        border-left-color: var(--primary-color);
+      }
+
+      .timeline-column:nth-child(even) .timeline-content {
+        border-left-color: var(--secondary-color);
+      }
+
+      .timeline-column:nth-child(3n) .timeline-content {
+        border-left-color: var(--success-color);
+      }
+
+      .timeline-column:nth-child(4n) .timeline-content {
+        border-left-color: var(--warning-color);
+      }
+
+      .timeline-content.shared {
+        background-color: #f8f9ff;
+        border-left: 4px solid #6c5ce7;
+      }
+
+      .timeline-content h5 {
+        margin-top: 0;
+        color: var(--dark-color);
+      }
+
+      .timeline-content p {
+        margin-bottom: 0;
+        color: #6c757d;
+      }
+
+      .timeline-time {
+        font-weight: 600;
+        color: var(--primary-color);
+      }
+
+      .timeline-transport {
+        display: inline-flex;
+        align-items: center;
+        background-color: rgba(58, 134, 255, 0.1);
+        padding: 4px 10px;
+        border-radius: 20px;
+        margin-top: 8px;
+        color: var(--primary-color);
+      }
+
+      .timeline-transport i {
+        margin-right: 5px;
+      }
+
+      .timeline-url {
+        display: inline-flex;
+        align-items: center;
+        background-color: rgba(6, 214, 160, 0.1);
+        padding: 4px 10px;
+        border-radius: 20px;
+        margin-top: 8px;
+        margin-left: 8px;
+        color: var(--success-color);
+      }
+
+      .timeline-url i {
+        margin-right: 5px;
+      }
+
+      .timeline-person {
+        display: inline-flex;
+        align-items: center;
+        background-color: rgba(131, 56, 236, 0.1);
+        padding: 4px 10px;
+        border-radius: 20px;
+        margin-top: 8px;
+        color: var(--secondary-color);
+      }
+
+      .timeline-person i {
+        margin-right: 5px;
+      }
+
+      .form-control:focus,
+      .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.25rem rgba(58, 134, 255, 0.25);
+      }
+
+      .modal-content {
+        border-radius: 12px;
+        border: none;
+      }
+
+      .modal-header {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        color: white;
+        border-radius: 12px 12px 0 0;
+        border-bottom: none;
+      }
+
+      .modal-footer {
+        border-top: none;
+      }
+
+      .transport-icon {
+        margin-right: 5px;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #6c757d;
+      }
+
+      .empty-state i {
+        font-size: 4rem;
+        color: #dee2e6;
+        margin-bottom: 20px;
+      }
+
+      .empty-state h4 {
+        margin-bottom: 10px;
+        color: #495057;
+      }
+
+      .mrt-station {
+        margin-bottom: 10px;
+      }
+
+      .mrt-line {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 4px;
+        color: white;
+        font-weight: 600;
+        font-size: 0.8rem;
+        margin-left: 5px;
+      }
+
+      .mrt-line.cg,
+      .mrt-line.ew {
+        background-color: var(--cg-color);
+      }
+
+      .mrt-line.ns {
+        background-color: var(--ns-color);
+      }
+
+      .mrt-line.ne {
+        background-color: var(--ne-color);
+      }
+
+      .mrt-line.cc {
+        background-color: var(--cc-color);
+      }
+
+      .mrt-line.dt {
+        background-color: var(--dt-color);
+      }
+
+      .mrt-line.te {
+        background-color: var(--te-color);
+      }
+
+      .mrt-line.bp {
+        background-color: var(--bp-color);
+      }
+
+      .mrt-line.ce {
+        background-color: var(--ce-color);
+      }
+
+      .mrt-line.st,
+      .mrt-line.pt,
+      .mrt-line.rt {
+        background-color: var(--st-color);
+      }
+
+      .mrt-arrow {
+        display: block;
+        text-align: center;
+        font-size: 1.2rem;
+        margin: 5px 0;
+        color: #6c757d;
+      }
+
+      .shared-indicator {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        background-color: #6c5ce7;
+        color: white;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+      }
+
+      .note-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        z-index: 10;
+      }
+
+      .note-btn:hover {
+        background-color: #e9ecef;
+      }
+
+      .note-btn i {
+        color: #6c757d;
+      }
+
+      .note-indicator {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: var(--warning-color);
+      }
+
+      .note-content {
+        background-color: #fff9db;
+        border-radius: 8px;
+        padding: 10px;
+        margin-top: 10px;
+        border-left: 3px solid var(--warning-color);
+      }
+
+      .delete-person-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        font-size: 0.8rem;
+        padding: 2px 5px;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      @media (max-width: 767.98px) {
+        .timeline-row {
+          flex-direction: column;
+        }
+
+        .timeline-column {
+          margin-bottom: 20px;
+        }
+
+        .timeline-content.shared {
+          margin-left: 0;
+          margin-right: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+      <div class="container">
+        <a class="navbar-brand" href="#">
+          <i class="bi bi-calendar-event me-2"></i>
+          Itinerary Timeline Manager
+        </a>
+        <button class="btn btn-light ms-auto" id="addItineraryBtn">
+          <i class="bi bi-plus-lg me-1"></i> Add Itinerary
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="card mb-4">
+            <div
+              class="card-header d-flex justify-content-between align-items-center"
+            >
+              <h5 class="mb-0">Itinerary Timeline</h5>
+              <div>
+                <button
+                  class="btn btn-sm btn-outline-primary me-2"
+                  id="sortByDateBtn"
+                >
+                  <i class="bi bi-sort-down"></i> Sort by Date
+                </button>
+                <button
+                  class="btn btn-sm btn-outline-secondary me-2"
+                  id="filterByPersonBtn"
+                >
+                  <i class="bi bi-funnel"></i> Filter by Person
+                </button>
+                <button
+                  class="btn btn-sm btn-outline-success"
+                  id="manageColumnsBtn"
+                >
+                  <i class="bi bi-columns-gap"></i> Manage Columns
+                </button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div id="timeline" class="timeline">
+                <!-- Timeline items will be inserted here -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add/Edit Itinerary Modal -->
+    <div
+      class="modal fade"
+      id="itineraryModal"
+      tabindex="-1"
+      aria-labelledby="itineraryModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="itineraryModalLabel">
+              Add New Itinerary
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="itineraryForm">
+              <input type="hidden" id="itineraryId" />
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="activityDate" class="form-label"
+                    >Activity Date</label
+                  >
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="activityDate"
+                    required
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="person" class="form-label">Person</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="person"
+                    placeholder="Enter person name"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="mb-3">
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="isSharedActivity"
+                  />
+                  <label class="form-check-label" for="isSharedActivity">
+                    This is a shared activity (will span across all columns)
+                  </label>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="startTime" class="form-label">Start Time</label>
+                  <input
+                    type="time"
+                    class="form-control"
+                    id="startTime"
+                    required
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="endTime" class="form-label">End Time</label>
+                  <input
+                    type="time"
+                    class="form-control"
+                    id="endTime"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="transportation" class="form-label"
+                  >Transportation Type</label
+                >
+                <select class="form-select" id="transportation">
+                  <option value="">None</option>
+                  <option value="ridehailing">Ridehailing (Grab/Go-Car)</option>
+                  <option value="car">Car</option>
+                  <option value="airport_train">Airport Train</option>
+                  <option value="train">Train</option>
+                  <option value="monorail">Monorail</option>
+                  <option value="mrt">MRT</option>
+                  <option value="airplane">Airplane</option>
+                  <option value="walk">Walk</option>
+                  <option value="bed">Bed</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              <!-- MRT Specific Fields (hidden by default) -->
+              <div id="mrtFields" class="d-none">
+                <div class="row mb-3">
+                  <div class="col-md-12">
+                    <label for="originStation" class="form-label"
+                      >Origin Station</label
+                    >
+                    <select class="form-select" id="originStation">
+                      <option value="">Select Origin Station</option>
+                      <!-- Station options will be populated by JavaScript -->
+                    </select>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="hasTransit"
+                    />
+                    <label class="form-check-label" for="hasTransit">
+                      Has Transit Station
+                    </label>
+                  </div>
+                </div>
+
+                <div id="transitFields" class="d-none">
+                  <div class="row mb-3">
+                    <div class="col-md-12">
+                      <label for="transitStation" class="form-label"
+                        >Transit Station</label
+                      >
+                      <select class="form-select" id="transitStation">
+                        <option value="">Select Transit Station</option>
+                        <!-- Station options will be populated by JavaScript -->
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <div class="col-md-12">
+                    <label for="destinationStation" class="form-label"
+                      >Destination Station</label
+                    >
+                    <select class="form-select" id="destinationStation">
+                      <option value="">Select Destination Station</option>
+                      <!-- Station options will be populated by JavaScript -->
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Regular Activity Fields -->
+              <div id="regularActivityFields">
+                <div class="mb-3">
+                  <label for="activityDescription" class="form-label"
+                    >Activity Description</label
+                  >
+                  <textarea
+                    class="form-control"
+                    id="activityDescription"
+                    rows="3"
+                    placeholder="Describe the activity"
+                  ></textarea>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="urlType" class="form-label">URL Type</label>
+                <select class="form-select" id="urlType">
+                  <option value="">None</option>
+                  <option value="maps">Google Maps URL</option>
+                  <option value="other">Other URL</option>
+                </select>
+              </div>
+
+              <div id="urlField" class="mb-3 d-none">
+                <label for="url" class="form-label">URL</label>
+                <input
+                  type="url"
+                  class="form-control"
+                  id="url"
+                  placeholder="https://..."
+                />
+              </div>
+
+              <div class="mb-3">
+                <label for="note" class="form-label">Note (Optional)</label>
+                <textarea
+                  class="form-control"
+                  id="note"
+                  rows="2"
+                  placeholder="Add a note for this activity"
+                ></textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button type="button" class="btn btn-primary" id="saveItineraryBtn">
+              Save Itinerary
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Modal -->
+    <div
+      class="modal fade"
+      id="filterModal"
+      tabindex="-1"
+      aria-labelledby="filterModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="filterModalLabel">Filter by Person</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div id="personFilterOptions">
+              <!-- Person filter checkboxes will be inserted here -->
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button type="button" class="btn btn-primary" id="applyFilterBtn">
+              Apply Filter
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Manage Columns Modal -->
+    <div
+      class="modal fade"
+      id="columnsModal"
+      tabindex="-1"
+      aria-labelledby="columnsModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="columnsModalLabel">Manage Columns</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p>Select which persons should have their own column:</p>
+            <div id="columnOptions">
+              <!-- Column options will be inserted here -->
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button type="button" class="btn btn-primary" id="applyColumnsBtn">
+              Apply
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div
+      class="modal fade"
+      id="deleteModal"
+      tabindex="-1"
+      aria-labelledby="deleteModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p>
+              Are you sure you want to delete this itinerary? This action cannot
+              be undone.
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Person Confirmation Modal -->
+    <div
+      class="modal fade"
+      id="deletePersonModal"
+      tabindex="-1"
+      aria-labelledby="deletePersonModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deletePersonModalLabel">
+              Confirm Delete Person
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p>
+              Are you sure you want to delete
+              <span id="personToDelete"></span> and all their activities? This
+              action cannot be undone.
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger"
+              id="confirmDeletePersonBtn"
+            >
+              Delete Person
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Note Modal -->
+    <div
+      class="modal fade"
+      id="noteModal"
+      tabindex="-1"
+      aria-labelledby="noteModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="noteModalLabel">Add Note</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="noteForm">
+              <input type="hidden" id="noteItineraryId" />
+              <div class="mb-3">
+                <label for="noteText" class="form-label">Note</label>
+                <textarea
+                  class="form-control"
+                  id="noteText"
+                  rows="4"
+                  placeholder="Add your note here"
+                ></textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button type="button" class="btn btn-primary" id="saveNoteBtn">
+              Save Note
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      $(document).ready(function () {
+        // Initialize variables
+        let itineraries = [];
+        let currentId = null;
+        let filteredPersons = [];
+        let activeColumns = [];
+        let personToDelete = "";
+
+        // MRT Station data
+        const mrtStations = [
+          { name: "Jurong East", lines: ["NS", "EW"] },
+          { name: "Bukit Batok", lines: ["NS"] },
+          { name: "Bukit Gombak", lines: ["NS"] },
+          { name: "Choa Chu Kang", lines: ["NS", "BP"] },
+          { name: "Yew Tee", lines: ["NS"] },
+          { name: "Kranji", lines: ["NS"] },
+          { name: "Marsiling", lines: ["NS"] },
+          { name: "Woodlands", lines: ["NS", "TE"] },
+          { name: "Admiralty", lines: ["NS"] },
+          { name: "Sembawang", lines: ["NS"] },
+          { name: "Canberra", lines: ["NS"] },
+          { name: "Yishun", lines: ["NS"] },
+          { name: "Khatib", lines: ["NS"] },
+          { name: "Yio Chu Kang", lines: ["NS"] },
+          { name: "Ang Mo Kio", lines: ["NS"] },
+          { name: "Bishan", lines: ["NS", "CC"] },
+          { name: "Braddell", lines: ["NS"] },
+          { name: "Toa Payoh", lines: ["NS"] },
+          { name: "Novena", lines: ["NS"] },
+          { name: "Newton", lines: ["NS", "DT"] },
+          { name: "Orchard", lines: ["NS"] },
+          { name: "Somerset", lines: ["NS"] },
+          { name: "Dhoby Ghaut", lines: ["NS", "NE", "CC"] },
+          { name: "City Hall", lines: ["NS", "EW"] },
+          { name: "Raffles Place", lines: ["NS", "EW"] },
+          { name: "Marina Bay", lines: ["NS", "CE"] },
+          { name: "Marina South Pier", lines: ["NS"] },
+          { name: "Pasir Ris", lines: ["EW"] },
+          { name: "Tampines", lines: ["EW", "DT"] },
+          { name: "Simei", lines: ["EW"] },
+          { name: "Tanah Merah", lines: ["EW", "CG"] },
+          { name: "Bedok", lines: ["EW"] },
+          { name: "Kembangan", lines: ["EW"] },
+          { name: "Eunos", lines: ["EW"] },
+          { name: "Paya Lebar", lines: ["EW", "CC"] },
+          { name: "Aljunied", lines: ["EW"] },
+          { name: "Kallang", lines: ["EW"] },
+          { name: "Lavender", lines: ["EW"] },
+          { name: "Bugis", lines: ["EW", "DT"] },
+          { name: "Tanjong Pagar", lines: ["EW"] },
+          { name: "Outram Park", lines: ["EW", "NE"] },
+          { name: "Tiong Bahru", lines: ["EW"] },
+          { name: "Redhill", lines: ["EW"] },
+          { name: "Queenstown", lines: ["EW"] },
+          { name: "Commonwealth", lines: ["EW"] },
+          { name: "Buona Vista", lines: ["EW", "CC"] },
+          { name: "Dover", lines: ["EW"] },
+          { name: "Clementi", lines: ["EW"] },
+          { name: "Chinese Garden", lines: ["EW"] },
+          { name: "Lakeside", lines: ["EW"] },
+          { name: "Boon Lay", lines: ["EW"] },
+          { name: "Pioneer", lines: ["EW"] },
+          { name: "Joo Koon", lines: ["EW"] },
+          { name: "Gul Circle", lines: ["EW"] },
+          { name: "Tuas Crescent", lines: ["EW"] },
+          { name: "Tuas West Road", lines: ["EW"] },
+          { name: "Tuas Link", lines: ["EW"] },
+          { name: "Expo", lines: ["CG", "DT"] },
+          { name: "Changi Airport", lines: ["CG"] },
+          { name: "HarbourFront", lines: ["NE", "CC"] },
+          { name: "Chinatown", lines: ["NE", "DT"] },
+          { name: "Clarke Quay", lines: ["NE"] },
+          { name: "Little India", lines: ["NE", "DT"] },
+          { name: "Farrer Park", lines: ["NE"] },
+          { name: "Boon Keng", lines: ["NE"] },
+          { name: "Potong Pasir", lines: ["NE"] },
+          { name: "Woodleigh", lines: ["NE"] },
+          { name: "Serangoon", lines: ["NE", "CC"] },
+          { name: "Kovan", lines: ["NE"] },
+          { name: "Hougang", lines: ["NE"] },
+          { name: "Buangkok", lines: ["NE"] },
+          { name: "Sengkang", lines: ["NE", "ST"] },
+          { name: "Punggol", lines: ["NE", "PT"] },
+          { name: "Bras Basah", lines: ["CC"] },
+          { name: "Esplanade", lines: ["CC"] },
+          { name: "Promenade", lines: ["CC", "DT"] },
+          { name: "Nicoll Highway", lines: ["CC"] },
+          { name: "Stadium", lines: ["CC"] },
+          { name: "Mountbatten", lines: ["CC"] },
+          { name: "Dakota", lines: ["CC"] },
+          { name: "MacPherson", lines: ["CC", "DT"] },
+          { name: "Tai Seng", lines: ["CC"] },
+          { name: "Bartley", lines: ["CC"] },
+          { name: "Lorong Chuan", lines: ["CC"] },
+          { name: "Marymount", lines: ["CC"] },
+          { name: "Caldecott", lines: ["CC"] },
+          { name: "Botanic Gardens", lines: ["CC", "DT"] },
+          { name: "Farrer Road", lines: ["CC"] },
+          { name: "Holland Village", lines: ["CC"] },
+          { name: "one-north", lines: ["CC"] },
+          { name: "Kent Ridge", lines: ["CC"] },
+          { name: "Haw Par Villa", lines: ["CC"] },
+          { name: "Pasir Panjang", lines: ["CC"] },
+          { name: "Labrador Park", lines: ["CC"] },
+          { name: "Telok Blangah", lines: ["CC"] },
+          { name: "Bayfront", lines: ["CE", "DT"] },
+          { name: "Bukit Panjang", lines: ["DT", "BP"] },
+          { name: "Cashew", lines: ["DT"] },
+          { name: "Hillview", lines: ["DT"] },
+          { name: "Beauty World", lines: ["DT"] },
+          { name: "King Albert Park", lines: ["DT"] },
+          { name: "Sixth Avenue", lines: ["DT"] },
+          { name: "Tan Kah Kee", lines: ["DT"] },
+          { name: "Stevens", lines: ["DT"] },
+          { name: "Rochor", lines: ["DT"] },
+          { name: "Downtown", lines: ["DT"] },
+          { name: "Telok Ayer", lines: ["DT"] },
+          { name: "Fort Canning", lines: ["DT"] },
+          { name: "Bencoolen", lines: ["DT"] },
+          { name: "Jalan Besar", lines: ["DT"] },
+          { name: "Bendemeer", lines: ["DT"] },
+          { name: "Geylang Bahru", lines: ["DT"] },
+          { name: "Mattar", lines: ["DT"] },
+          { name: "Ubi", lines: ["DT"] },
+          { name: "Kaki Bukit", lines: ["DT"] },
+          { name: "Bedok North", lines: ["DT"] },
+          { name: "Bedok Reservoir", lines: ["DT"] },
+          { name: "Tampines West", lines: ["DT"] },
+          { name: "Tampines East", lines: ["DT"] },
+          { name: "Upper Changi", lines: ["DT"] },
+          { name: "Woodlands North", lines: ["TE", "RT"] },
+          { name: "Woodlands South", lines: ["TE"] },
+          { name: "Springleaf", lines: ["TE"] },
+          { name: "Lentor", lines: ["TE"] },
+          { name: "Mayflower", lines: ["TE"] },
+          { name: "Bright Hill", lines: ["TE"] },
+          { name: "Upper Thomson", lines: ["TE"] },
+          { name: "Caldecott", lines: ["TE", "CC"] },
+          { name: "Stevens", lines: ["TE", "DT"] },
+          { name: "Napier", lines: ["TE"] },
+          { name: "Orchard Boulevard", lines: ["TE"] },
+          { name: "Orchard", lines: ["TE", "NS"] },
+          { name: "Great World", lines: ["TE"] },
+          { name: "Havelock", lines: ["TE"] },
+          { name: "Outram Park", lines: ["TE", "EW", "NE"] },
+          { name: "Maxwell", lines: ["TE"] },
+          { name: "Shenton Way", lines: ["TE"] },
+          { name: "Marina Bay", lines: ["TE", "NS", "CE"] },
+          { name: "Gardens by the Bay", lines: ["TE"] },
+          { name: "Tanjong Rhu", lines: ["TE"] },
+          { name: "Katong Park", lines: ["TE"] },
+          { name: "Tanjong Katong", lines: ["TE"] },
+          { name: "Marine Parade", lines: ["TE"] },
+          { name: "Marine Terrace", lines: ["TE"] },
+          { name: "Siglap", lines: ["TE"] },
+          { name: "Bayshore", lines: ["TE"] },
+        ];
+
+        // Initialize Bootstrap modals
+        const itineraryModal = new bootstrap.Modal(
+          document.getElementById("itineraryModal")
+        );
+        const filterModal = new bootstrap.Modal(
+          document.getElementById("filterModal")
+        );
+        const columnsModal = new bootstrap.Modal(
+          document.getElementById("columnsModal")
+        );
+        const deleteModal = new bootstrap.Modal(
+          document.getElementById("deleteModal")
+        );
+        const deletePersonModal = new bootstrap.Modal(
+          document.getElementById("deletePersonModal")
+        );
+        const noteModal = new bootstrap.Modal(
+          document.getElementById("noteModal")
+        );
+
+        // Populate MRT station dropdowns
+        function populateStationDropdowns() {
+          const stationOptions = mrtStations
+            .map((station) => {
+              return `<option value="${
+                station.name
+              }" data-lines="${station.lines.join(",")}">${
+                station.name
+              }</option>`;
+            })
+            .join("");
+
+          $("#originStation").html(
+            '<option value="">Select Origin Station</option>' + stationOptions
+          );
+          $("#transitStation").html(
+            '<option value="">Select Transit Station</option>' + stationOptions
+          );
+          $("#destinationStation").html(
+            '<option value="">Select Destination Station</option>' +
+              stationOptions
+          );
+        }
+
+        // Load itineraries from localStorage
+        function loadItineraries() {
+          var settings = {
+            url: "http://api.backendless.com/BA16D424-5754-4629-9A48-0A2B2CCAA2C2/C0E39065-3160-484A-8F65-1163FDC9F4EA/data/itinerary",
+            method: "GET",
+            timeout: 0,
+            headers: {
+              "Content-Type": "application/json",
+            },
+          };
+
+          $.ajax(settings).done(function (response) {
+            localStorage.setItem("itineraries", JSON.stringify(response));
+            const storedItineraries = localStorage.getItem("itineraries");
+            if (storedItineraries) {
+              itineraries = JSON.parse(storedItineraries);
+            }
+
+            // Load active columns
+            const storedColumns = localStorage.getItem("activeColumns");
+            if (storedColumns) {
+              activeColumns = JSON.parse(storedColumns);
+            } else {
+              // Initialize with unique persons from itineraries
+              activeColumns = [
+                ...new Set(itineraries.map((item) => item.person)),
+              ];
+              saveActiveColumns();
+            }
+
+            renderTimeline();
+          });
+        }
+
+        // Save itineraries to localStorage
+        function saveItineraries() {
+          localStorage.setItem("itineraries", JSON.stringify(itineraries));
+        }
+
+        // Save active columns to localStorage
+        function saveActiveColumns() {
+          localStorage.setItem("activeColumns", JSON.stringify(activeColumns));
+        }
+
+        // Generate a unique ID
+        function generateId() {
+          return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        // Format date for display
+        function formatDate(dateString) {
+          const options = {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          };
+          return new Date(dateString).toLocaleDateString("id-ID", options);
+        }
+
+        // Get transportation icon
+        function getTransportIcon(transport) {
+          switch (transport) {
+            case "ridehailing":
+              return "bi-car-front";
+            case "car":
+              return "bi-car-front";
+            case "airport_train":
+              return "bi-train-front";
+            case "train":
+              return "bi-train-front";
+            case "monorail":
+              return "bi-train-front";
+            case "mrt":
+              return "bi-train-front";
+            case "airplane":
+              return "bi-airplane";
+            case "walk":
+              return "bi-person-walking";
+            case "bed":
+              return "bi-moon";
+            case "other":
+              return "bi-arrow-right-circle";
+            default:
+              return "";
+          }
+        }
+
+        // Get transportation label
+        function getTransportLabel(transport) {
+          switch (transport) {
+            case "ridehailing":
+              return "Ridehailing (Grab/Go-Car)";
+            case "car":
+              return "Car";
+            case "airport_train":
+              return "Airport Train";
+            case "train":
+              return "Train";
+            case "monorail":
+              return "Monorail";
+            case "mrt":
+              return "MRT";
+            case "airplane":
+              return "Airplane";
+            case "walk":
+              return "Walk";
+            case "bed":
+              return "Bed";
+            case "other":
+              return "Other";
+            default:
+              return "";
+          }
+        }
+
+        // Group itineraries by date
+        function groupByDate(items) {
+          const grouped = {};
+          items.forEach((item) => {
+            if (!grouped[item.activityDate]) {
+              grouped[item.activityDate] = [];
+            }
+            grouped[item.activityDate].push(item);
+          });
+          return grouped;
+        }
+
+        // Render the timeline
+        function renderTimeline() {
+          const $timeline = $("#timeline");
+          $timeline.empty();
+
+          // Filter itineraries if needed
+          let itemsToRender = [...itineraries];
+          if (filteredPersons.length > 0) {
+            itemsToRender = itineraries.filter(
+              (item) => filteredPersons.includes(item.person) || item.isShared
+            );
+          }
+
+          // Sort by date and time
+          itemsToRender.sort((a, b) => {
+            const dateA = new Date(`${a.activityDate}T${a.startTime}`);
+            const dateB = new Date(`${b.activityDate}T${b.startTime}`);
+            return dateA - dateB;
+          });
+
+          // Group by date
+          const groupedByDate = groupByDate(itemsToRender);
+
+          // If no itineraries, show empty state
+          if (itemsToRender.length === 0) {
+            $timeline.html(`
+                        <div class="empty-state">
+                            <i class="bi bi-calendar-x"></i>
+                            <h4>No Itineraries Found</h4>
+                            <p>Add your first itinerary to get started</p>
+                            <button class="btn btn-primary mt-3" id="emptyStateAddBtn">
+                                <i class="bi bi-plus-lg me-1"></i> Add Itinerary
+                            </button>
+                        </div>
+                    `);
+            return;
+          }
+
+          // Get columns to display
+          let columnsToShow = [...activeColumns];
+          if (columnsToShow.length === 0) {
+            // If no columns are selected, show a default column
+            columnsToShow = ["Activities"];
+          }
+
+          // Render each date group
+          Object.keys(groupedByDate)
+            .sort()
+            .forEach((date) => {
+              const dateItems = groupedByDate[date];
+
+              // Add date header
+              $timeline.append(`
+                        <div class="text-center mb-4">
+                            <div class="timeline-date-header">${formatDate(
+                              date
+                            )}</div>
+                        </div>
+                    `);
+
+              // Sort items by time
+              dateItems.sort((a, b) => {
+                const timeA = a.startTime;
+                const timeB = b.startTime;
+                return timeA.localeCompare(timeB);
+              });
+
+              // Group items by time slot
+              const timeSlots = {};
+              dateItems.forEach((item) => {
+                const timeKey = `${item.startTime}-${item.endTime}`;
+                if (!timeSlots[timeKey]) {
+                  timeSlots[timeKey] = [];
+                }
+                timeSlots[timeKey].push(item);
+              });
+
+              // Render each time slot
+              Object.keys(timeSlots)
+                .sort()
+                .forEach((timeKey) => {
+                  const slotItems = timeSlots[timeKey];
+
+                  // Check if there's a shared activity in this slot
+                  const sharedActivity = slotItems.find(
+                    (item) => item.isShared
+                  );
+
+                  if (sharedActivity) {
+                    // Render shared activity that spans all columns
+                    $timeline.append(`
+                                <div class="timeline-row mb-4">
+                                    <div class="timeline-column" style="flex: 1;">
+                                        <div class="timeline-content shared">
+                                            <div class="shared-indicator">
+                                                <i class="bi bi-people-fill"></i>
+                                            </div>
+                                            <button class="note-btn" data-id="${
+                                              sharedActivity.id
+                                            }">
+                                                <i class="bi bi-sticky"></i>
+                                                ${
+                                                  sharedActivity.note
+                                                    ? '<div class="note-indicator"></div>'
+                                                    : ""
+                                                }
+                                            </button>
+                                            ${renderItineraryContent(
+                                              sharedActivity
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            `);
+                  } else {
+                    // Render regular activities in columns
+                    const rowHtml = `
+                                <div class="timeline-row">
+                                    ${columnsToShow
+                                      .map((person) => {
+                                        // Find item for this person in this time slot
+                                        const personItem = slotItems.find(
+                                          (item) => item.person === person
+                                        );
+
+                                        return `
+                                            <div class="timeline-column">
+                                                <div class="timeline-column-header">
+                                                    ${person}
+                                                    <button class="btn btn-sm btn-danger delete-person-btn" data-person="${person}">
+                                                        <i class="bi bi-x"></i>
+                                                    </button>
+                                                </div>
+                                                ${
+                                                  personItem
+                                                    ? `
+                                                    <div class="timeline-content">
+                                                        <button class="note-btn" data-id="${
+                                                          personItem.id
+                                                        }">
+                                                            <i class="bi bi-sticky"></i>
+                                                            ${
+                                                              personItem.note
+                                                                ? '<div class="note-indicator"></div>'
+                                                                : ""
+                                                            }
+                                                        </button>
+                                                        ${renderItineraryContent(
+                                                          personItem
+                                                        )}
+                                                    </div>
+                                                `
+                                                    : ""
+                                                }
+                                            </div>
+                                        `;
+                                      })
+                                      .join("")}
+                                </div>
+                            `;
+                    $timeline.append(rowHtml);
+                  }
+                });
+            });
+        }
+
+        // Render the content of a single itinerary
+        function renderItineraryContent(item) {
+          let contentHtml = "";
+
+          // Time display
+          contentHtml += `
+                    <p class="timeline-time">
+                        <i class="bi bi-clock me-1"></i>
+                        ${item.startTime} - ${item.endTime}
+                    </p>
+                `;
+
+          // For MRT, show station information
+          if (item.transportation === "mrt") {
+            contentHtml += renderMrtContent(item);
+          } else {
+            // Regular activity description
+            contentHtml += `<h5>${
+              item.activityDescription || "Untitled Activity"
+            }</h5>`;
+          }
+
+          // Note content (if exists)
+          if (item.note) {
+            contentHtml += `
+                        <div class="note-content mt-2">
+                            <i class="bi bi-sticky me-1"></i> ${item.note}
+                        </div>
+                    `;
+          }
+
+          // Person info (for shared activities)
+          if (item.isShared) {
+            contentHtml += `
+                        <div class="timeline-person mb-2">
+                            <i class="bi bi-people"></i>
+                            Shared Activity
+                        </div>
+                    `;
+          }
+
+          // Transportation
+          if (item.transportation && item.transportation !== "mrt") {
+            contentHtml += `
+                        <div class="timeline-transport">
+                            <i class="bi ${getTransportIcon(
+                              item.transportation
+                            )}"></i>
+                            ${getTransportLabel(item.transportation)}
+                        </div>
+                    `;
+          }
+
+          // URL
+          if (item.urlType && item.url) {
+            const urlIcon =
+              item.urlType === "maps" ? "bi-geo-alt" : "bi-link-45deg";
+            const urlLabel = item.urlType === "maps" ? "Google Maps" : "Link";
+
+            contentHtml += `
+                        <a href="${item.url}" target="_blank" class="timeline-url">
+                            <i class="bi ${urlIcon}"></i>
+                            ${urlLabel}
+                        </a>
+                    `;
+          }
+
+          // Action buttons
+          contentHtml += `
+                    <div class="mt-3">
+                        <button class="btn btn-sm btn-outline-primary edit-btn" data-id="${item.id}">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${item.id}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                `;
+
+          return contentHtml;
+        }
+
+        // Render MRT specific content
+        function renderMrtContent(item) {
+          let mrtHtml = '<div class="mrt-journey">';
+
+          // Origin station
+          if (item.originStation) {
+            const originLines = getStationLines(item.originStation);
+            mrtHtml += `
+                        <div class="mrt-station">
+                            ${item.originStation} ${renderLinesBadges(
+              originLines
+            )}
+                        </div>
+                    `;
+          }
+
+          // Arrow
+          mrtHtml +=
+            '<div class="mrt-arrow"><i class="bi bi-arrow-down"></i></div>';
+
+          // Transit station (if any)
+          if (item.hasTransit && item.transitStation) {
+            const transitLines = getStationLines(item.transitStation);
+            mrtHtml += `
+                        <div class="mrt-station">
+                            ${item.transitStation} ${renderLinesBadges(
+              transitLines
+            )}
+                        </div>
+                        <div class="mrt-arrow"><i class="bi bi-arrow-down"></i></div>
+                    `;
+          }
+
+          // Destination station
+          if (item.destinationStation) {
+            const destinationLines = getStationLines(item.destinationStation);
+            mrtHtml += `
+                        <div class="mrt-station">
+                            ${item.destinationStation} ${renderLinesBadges(
+              destinationLines
+            )}
+                        </div>
+                    `;
+          }
+
+          mrtHtml += "</div>";
+          return mrtHtml;
+        }
+
+        // Get station lines from station name
+        function getStationLines(stationName) {
+          const station = mrtStations.find((s) => s.name === stationName);
+          return station ? station.lines : [];
+        }
+
+        // Render line badges
+        function renderLinesBadges(lines) {
+          return lines
+            .map(
+              (line) =>
+                `<span class="mrt-line ${line.toLowerCase()}">${line}</span>`
+            )
+            .join(" ");
+        }
+
+        // Update person filter options
+        function updatePersonFilterOptions() {
+          const $options = $("#personFilterOptions");
+          $options.empty();
+
+          // Get unique persons
+          const persons = [...new Set(itineraries.map((item) => item.person))];
+
+          if (persons.length === 0) {
+            $options.html("<p>No persons found in itineraries.</p>");
+            return;
+          }
+
+          // Add checkboxes for each person
+          persons.forEach((person) => {
+            const isChecked = filteredPersons.includes(person);
+            $options.append(`
+                        <div class="form-check">
+                            <input class="form-check-input person-filter" type="checkbox" value="${person}" id="person-${person.replace(
+              /\s+/g,
+              "-"
+            )}" ${isChecked ? "checked" : ""}>
+                            <label class="form-check-label" for="person-${person.replace(
+                              /\s+/g,
+                              "-"
+                            )}">
+                                ${person}
+                            </label>
+                        </div>
+                    `);
+          });
+        }
+
+        // Update column options
+        function updateColumnOptions() {
+          const $options = $("#columnOptions");
+          $options.empty();
+
+          // Get unique persons
+          const persons = [...new Set(itineraries.map((item) => item.person))];
+
+          if (persons.length === 0) {
+            $options.html("<p>No persons found in itineraries.</p>");
+            return;
+          }
+
+          // Add checkboxes for each person
+          persons.forEach((person) => {
+            const isChecked = activeColumns.includes(person);
+            $options.append(`
+                        <div class="form-check">
+                            <input class="form-check-input column-option" type="checkbox" value="${person}" id="column-${person.replace(
+              /\s+/g,
+              "-"
+            )}" ${isChecked ? "checked" : ""}>
+                            <label class="form-check-label" for="column-${person.replace(
+                              /\s+/g,
+                              "-"
+                            )}">
+                                ${person}
+                            </label>
+                        </div>
+                    `);
+          });
+        }
+
+        // Clear form fields
+        function clearForm() {
+          $("#itineraryId").val("");
+          $("#activityDate").val("");
+          $("#startTime").val("");
+          $("#endTime").val("");
+          $("#transportation").val("");
+          $("#person").val("");
+          $("#activityDescription").val("");
+          $("#isSharedActivity").prop("checked", false);
+          $("#urlType").val("");
+          $("#url").val("");
+          $("#note").val("");
+
+          // Clear MRT fields
+          $("#originStation").val("");
+          $("#hasTransit").prop("checked", false);
+          $("#transitStation").val("");
+          $("#destinationStation").val("");
+
+          // Hide conditional fields
+          $("#mrtFields").addClass("d-none");
+          $("#transitFields").addClass("d-none");
+          $("#urlField").addClass("d-none");
+          $("#regularActivityFields").removeClass("d-none");
+
+          currentId = null;
+        }
+
+        // Fill form with itinerary data
+        function fillForm(itinerary) {
+          $("#itineraryId").val(itinerary.id);
+          $("#activityDate").val(itinerary.activityDate);
+          $("#startTime").val(itinerary.startTime);
+          $("#endTime").val(itinerary.endTime);
+          $("#transportation").val(itinerary.transportation || "");
+          $("#person").val(itinerary.person);
+          $("#isSharedActivity").prop("checked", itinerary.isShared || false);
+          $("#urlType").val(itinerary.urlType || "");
+          $("#url").val(itinerary.url || "");
+          $("#note").val(itinerary.note || "");
+
+          // Show/hide URL field based on urlType
+          if (itinerary.urlType) {
+            $("#urlField").removeClass("d-none");
+          } else {
+            $("#urlField").addClass("d-none");
+          }
+
+          // Handle MRT specific fields
+          if (itinerary.transportation === "mrt") {
+            $("#mrtFields").removeClass("d-none");
+            $("#regularActivityFields").addClass("d-none");
+
+            $("#originStation").val(itinerary.originStation || "");
+
+            if (itinerary.hasTransit) {
+              $("#hasTransit").prop("checked", true);
+              $("#transitFields").removeClass("d-none");
+              $("#transitStation").val(itinerary.transitStation || "");
+            } else {
+              $("#hasTransit").prop("checked", false);
+              $("#transitFields").addClass("d-none");
+            }
+
+            $("#destinationStation").val(itinerary.destinationStation || "");
+          } else {
+            $("#mrtFields").addClass("d-none");
+            $("#regularActivityFields").removeClass("d-none");
+            $("#activityDescription").val(itinerary.activityDescription || "");
+          }
+
+          currentId = itinerary.id;
+        }
+
+        // Event: Add Itinerary button click
+        $(document).on(
+          "click",
+          "#addItineraryBtn, #emptyStateAddBtn",
+          function () {
+            clearForm();
+            $("#itineraryModalLabel").text("Add New Itinerary");
+            itineraryModal.show();
+          }
+        );
+
+        // Event: Transportation type change
+        $("#transportation").on("change", function () {
+          const transportType = $(this).val();
+
+          if (transportType === "mrt") {
+            $("#mrtFields").removeClass("d-none");
+            $("#regularActivityFields").addClass("d-none");
+          } else {
+            $("#mrtFields").addClass("d-none");
+            $("#regularActivityFields").removeClass("d-none");
+          }
+        });
+
+        // Event: Has Transit checkbox change
+        $("#hasTransit").on("change", function () {
+          if ($(this).is(":checked")) {
+            $("#transitFields").removeClass("d-none");
+          } else {
+            $("#transitFields").addClass("d-none");
+          }
+        });
+
+        // Event: URL Type change
+        $("#urlType").on("change", function () {
+          if ($(this).val()) {
+            $("#urlField").removeClass("d-none");
+          } else {
+            $("#urlField").addClass("d-none");
+          }
+        });
+
+        // Event: Save Itinerary button click
+        $("#saveItineraryBtn").on("click", function () {
+          const form = document.getElementById("itineraryForm");
+
+          // Basic form validation
+          if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+          }
+
+          const id = $("#itineraryId").val() || generateId();
+          const activityDate = $("#activityDate").val();
+          const startTime = $("#startTime").val();
+          const endTime = $("#endTime").val();
+          const transportation = $("#transportation").val();
+          const person = $("#person").val();
+          const isShared = $("#isSharedActivity").is(":checked");
+          const urlType = $("#urlType").val();
+          const url = $("#url").val();
+          const note = $("#note").val();
+
+          // Additional validation
+          if (startTime >= endTime) {
+            alert("End time must be after start time");
+            return;
+          }
+
+          // Create base itinerary object
+          const itinerary = {
+            id,
+            activityDate,
+            startTime,
+            endTime,
+            transportation,
+            person,
+            isShared,
+            urlType,
+            url,
+            note,
+          };
+
+          // Add MRT specific fields if applicable
+          if (transportation === "mrt") {
+            itinerary.originStation = $("#originStation").val();
+
+            const hasTransit = $("#hasTransit").is(":checked");
+            itinerary.hasTransit = hasTransit;
+
+            if (hasTransit) {
+              itinerary.transitStation = $("#transitStation").val();
+            }
+
+            itinerary.destinationStation = $("#destinationStation").val();
+          } else {
+            itinerary.activityDescription = $("#activityDescription").val();
+          }
+
+          if (currentId) {
+            // Update existing itinerary
+            const index = itineraries.findIndex(
+              (item) => item.id === currentId
+            );
+            if (index !== -1) {
+              itineraries[index] = itinerary;
+            }
+          } else {
+            // Add new itinerary
+            itineraries.push(itinerary);
+
+            // Add person to active columns if not already there
+            if (!activeColumns.includes(person)) {
+              activeColumns.push(person);
+              saveActiveColumns();
+            }
+          }
+
+          saveItineraries();
+          renderTimeline();
+          itineraryModal.hide();
+          clearForm();
+        });
+
+        // Event: Edit button click (delegated)
+        $(document).on("click", ".edit-btn", function () {
+          const id = $(this).data("id");
+          const itinerary = itineraries.find((item) => item.id === id);
+
+          if (itinerary) {
+            fillForm(itinerary);
+            $("#itineraryModalLabel").text("Edit Itinerary");
+            itineraryModal.show();
+          }
+        });
+
+        // Event: Delete button click (delegated)
+        $(document).on("click", ".delete-btn", function () {
+          const id = $(this).data("id");
+          currentId = id;
+          deleteModal.show();
+        });
+
+        // Event: Confirm Delete button click
+        $("#confirmDeleteBtn").on("click", function () {
+          if (currentId) {
+            itineraries = itineraries.filter((item) => item.id !== currentId);
+            saveItineraries();
+            renderTimeline();
+            deleteModal.hide();
+            currentId = null;
+          }
+        });
+
+        // Event: Delete Person button click (delegated)
+        $(document).on("click", ".delete-person-btn", function (e) {
+          e.stopPropagation();
+          personToDelete = $(this).data("person");
+          $("#personToDelete").text(personToDelete);
+          deletePersonModal.show();
+        });
+
+        // Event: Confirm Delete Person button click
+        $("#confirmDeletePersonBtn").on("click", function () {
+          if (personToDelete) {
+            // Remove person from itineraries
+            itineraries = itineraries.filter(
+              (item) => item.person !== personToDelete
+            );
+
+            // Remove person from active columns
+            activeColumns = activeColumns.filter(
+              (column) => column !== personToDelete
+            );
+
+            // Remove person from filtered persons
+            filteredPersons = filteredPersons.filter(
+              (person) => person !== personToDelete
+            );
+
+            saveItineraries();
+            saveActiveColumns();
+            renderTimeline();
+            deletePersonModal.hide();
+            personToDelete = "";
+          }
+        });
+
+        // Event: Note button click (delegated)
+        $(document).on("click", ".note-btn", function (e) {
+          e.stopPropagation();
+          const id = $(this).data("id");
+          const itinerary = itineraries.find((item) => item.id === id);
+
+          if (itinerary) {
+            $("#noteItineraryId").val(id);
+            $("#noteText").val(itinerary.note || "");
+            noteModal.show();
+          }
+        });
+
+        // Event: Save Note button click
+        $("#saveNoteBtn").on("click", function () {
+          const id = $("#noteItineraryId").val();
+          const note = $("#noteText").val();
+
+          if (id) {
+            const index = itineraries.findIndex((item) => item.id === id);
+            if (index !== -1) {
+              itineraries[index].note = note;
+              saveItineraries();
+              renderTimeline();
+            }
+          }
+
+          noteModal.hide();
+        });
+
+        // Event: Filter by Person button click
+        $("#filterByPersonBtn").on("click", function () {
+          updatePersonFilterOptions();
+          filterModal.show();
+        });
+
+        // Event: Apply Filter button click
+        $("#applyFilterBtn").on("click", function () {
+          filteredPersons = [];
+          $(".person-filter:checked").each(function () {
+            filteredPersons.push($(this).val());
+          });
+
+          renderTimeline();
+          filterModal.hide();
+        });
+
+        // Event: Manage Columns button click
+        $("#manageColumnsBtn").on("click", function () {
+          updateColumnOptions();
+          columnsModal.show();
+        });
+
+        // Event: Apply Columns button click
+        $("#applyColumnsBtn").on("click", function () {
+          activeColumns = [];
+          $(".column-option:checked").each(function () {
+            activeColumns.push($(this).val());
+          });
+
+          saveActiveColumns();
+          renderTimeline();
+          columnsModal.hide();
+        });
+
+        // Event: Sort by Date button click
+        $("#sortByDateBtn").on("click", function () {
+          itineraries.sort((a, b) => {
+            const dateA = new Date(a.activityDate);
+            const dateB = new Date(b.activityDate);
+            return dateA - dateB;
+          });
+
+          renderTimeline();
+        });
+
+        // Event: Station selection change - update lines automatically
+        $("#originStation, #transitStation, #destinationStation").on(
+          "change",
+          function () {
+            const stationName = $(this).val();
+            if (stationName) {
+              const station = mrtStations.find((s) => s.name === stationName);
+              if (station) {
+                // Lines are automatically associated with the station
+                console.log(
+                  `Selected station ${stationName} with lines: ${station.lines.join(
+                    ", "
+                  )}`
+                );
+              }
+            }
+          }
+        );
+
+        // Initialize the app
+        populateStationDropdowns();
+        loadItineraries();
+
+        // Add some sample data if no itineraries exist
+        if (itineraries.length === 0) {
+          const today = new Date().toISOString().split("T")[0];
+          const tomorrow = new Date();
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          const tomorrowStr = tomorrow.toISOString().split("T")[0];
+
+          itineraries = [
+            {
+              id: generateId(),
+              activityDate: today,
+              startTime: "08:00",
+              endTime: "09:30",
+              transportation: "car",
+              person: "Budi",
+              isShared: false,
+              urlType: "maps",
+              url: "https://maps.google.com/?q=Jakarta",
+              activityDescription: "Meeting with clients",
+              note: "Bring presentation materials",
+            },
+            {
+              id: generateId(),
+              activityDate: today,
+              startTime: "08:30",
+              endTime: "10:00",
+              transportation: "ridehailing",
+              person: "Ani",
+              isShared: false,
+              urlType: "other",
+              url: "https://example.com",
+              activityDescription: "Project presentation",
+            },
+            {
+              id: generateId(),
+              activityDate: today,
+              startTime: "12:00",
+              endTime: "13:30",
+              transportation: "",
+              person: "Budi",
+              isShared: true,
+              urlType: "maps",
+              url: "https://maps.google.com/?q=Restaurant",
+              activityDescription: "Team Lunch",
+              note: 'Reservation under name "Budi"',
+            },
+            {
+              id: generateId(),
+              activityDate: today,
+              startTime: "14:00",
+              endTime: "15:30",
+              transportation: "mrt",
+              person: "Budi",
+              isShared: false,
+              urlType: "",
+              url: "",
+              originStation: "Dhoby Ghaut",
+              hasTransit: true,
+              transitStation: "Serangoon",
+              destinationStation: "Tampines",
+            },
+            {
+              id: "2",
+              activityDate: "2025-01-01",
+              startTime: "09:00",
+              endTime: "12:00",
+              transportation: "airplane",
+              person: "Ani",
+              isShared: false,
+              urlType: "maps",
+              url: "https://maps.google.com/?q=Airport",
+              activityDescription: "Flight to Bali",
+            },
+            {
+              id: generateId(),
+              activityDate: tomorrowStr,
+              startTime: "10:00",
+              endTime: "11:30",
+              transportation: "bed",
+              person: "Budi",
+              isShared: false,
+              urlType: "",
+              url: "",
+              activityDescription: "Rest at home",
+            },
+          ];
+
+          // Set active columns
+          activeColumns = ["Budi", "Ani"];
+
+          saveItineraries();
+          saveActiveColumns();
+          renderTimeline();
+        }
+      });
+    </script>
+    <script>
+      (function () {
+        function c() {
+          var b = a.contentDocument || a.contentWindow.document;
+          if (b) {
+            var d = b.createElement("script");
+            d.innerHTML =
+              "window.__CF$cv$params={r:'93d8149ca05d405a',t:'MTc0Njg2NTg4OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+            b.getElementsByTagName("head")[0].appendChild(d);
+          }
+        }
+        if (document.body) {
+          var a = document.createElement("iframe");
+          a.height = 1;
+          a.width = 1;
+          a.style.position = "absolute";
+          a.style.top = 0;
+          a.style.left = 0;
+          a.style.border = "none";
+          a.style.visibility = "hidden";
+          document.body.appendChild(a);
+          if ("loading" !== document.readyState) c();
+          else if (window.addEventListener)
+            document.addEventListener("DOMContentLoaded", c);
+          else {
+            var e = document.onreadystatechange || function () {};
+            document.onreadystatechange = function (b) {
+              e(b);
+              "loading" !== document.readyState &&
+                ((document.onreadystatechange = e), c());
+            };
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>
